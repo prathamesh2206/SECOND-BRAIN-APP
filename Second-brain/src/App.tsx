@@ -1,34 +1,23 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-
+import Button from "./components/Button"
+import Card from "./components/Card"
+import PlusIcon from "./icons/PlusIcon"
+import ShareIcon from "./icons/ShareIcon"
+import "./index.css"
 function App() {
-  const [count, setCount] = useState(0)
+ 
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className=" p-4">
+      <div className="flex justify-end gap-4">
+      <Button variant="primary" text="Add Content" startIcon={<PlusIcon/>}/>
+      <Button variant="secondary" text="Share Brain" startIcon={<ShareIcon/>}/>
+     </div>
+      <div className="flex gap-4  ">
+      <Card title="first tweet" link="https://x.com/abhwshek/status/1891038378063442246" type="twitter"/>
+      <Card title="first video" link="https://www.youtube.com/watch?v=hYip_Vuv8J0" type="youtube"/>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+      
   )
 }
 
