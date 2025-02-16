@@ -17,16 +17,13 @@ const contentSchema = new mongoose.Schema({
     type: { type: String, enum: contentTypes, required: true },
     title: { type: String, required: true },
     tags: [{ type: mongoose.Types.ObjectId, ref: "Tags" }], 
-    userId: { type: mongoose.Types.ObjectId, ref: "Users" },
-    share:{type :Boolean,default:false} 
+    userId: { type: mongoose.Types.ObjectId, ref: "Users",required:true } 
 });
 const contentModel = mongoose.model("Contents", contentSchema);
 
 const linkSchema = new mongoose.Schema({
     hash: { type: String, required: true },
-    userId: { type: mongoose.Types.ObjectId, ref: "Users", required: true }, 
-    contentId: { type: mongoose.Types.ObjectId, ref: "Contents", required: true }
-});
+    userId: { type: mongoose.Types.ObjectId, ref: "Users", required: true ,unique:true} });
 const linkModel = mongoose.model("Links", linkSchema);
 
 export { userModel, tagModel, contentModel, linkModel };
