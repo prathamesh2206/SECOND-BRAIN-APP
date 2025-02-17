@@ -1,8 +1,9 @@
 import Dashboard from "./pages/Dashboard"
+import SignUp from "./pages/SignUp"
 
 const App = () => {
   return (
-    <Dashboard/>
+    <SignUp />
   )
 }
 

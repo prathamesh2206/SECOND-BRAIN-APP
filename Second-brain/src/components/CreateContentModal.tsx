@@ -11,7 +11,7 @@ const CreateContentModal = ({open,onClose}:modalProps) => {
     <div>
     { open &&  <div className="w-screen h-screen bg-slate-500 fixed top-0 left-0 bg-opacity-60 flex justify-center items-center">
         <div className="flex justify-center ">
-            <span className="bg-white opacity-100 p-4 rounded">
+            <span className="bg-white opacity-100 p-4 rounded-xl">
                 <div className=" flex justify-end">
                     <div onClick={onClose} className="cursor-pointer">
                     <CrossIcon />
