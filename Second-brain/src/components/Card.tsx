@@ -7,19 +7,19 @@ interface CardProps {
 
 const Card = ({ title, link, type }: CardProps) => {
   return (
-    <div className="transition-transform hover:scale-[1.02] duration-200">
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+    <div className="transition-transform hover:scale-[1.02] duration-200 w-full">
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden h-[300px] flex flex-col">
         {/* Header */}
-        <div className="p-4 border-b border-gray-100">
+        <div className="p-3 border-b border-gray-100 flex-shrink-0">
           <div className="flex justify-between items-center">
-            <div className="flex items-center">
-              <div className="text-gray-500 hover:text-purple-500 transition-colors">
+            <div className="flex items-center flex-1 min-w-0">
+              <div className="text-gray-500 hover:text-purple-500 transition-colors flex-shrink-0">
                 <ShareIcon />
               </div>
-              <span className="ml-2 font-medium text-gray-700">{title}</span>
+              <span className="ml-2 font-medium text-gray-700 truncate">{title}</span>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-shrink-0 ml-2">
               <a
                 href={link}
                 target="_blank"
@@ -36,12 +36,12 @@ const Card = ({ title, link, type }: CardProps) => {
         </div>
 
         {/* Content */}
-        <div className="p-4">
+        <div className="flex-grow p-2 relative">
           {type === "youtube" && (
-            <div className="aspect-video">
+            <div className="absolute inset-0 p-2">
               <iframe
                 className="w-full h-full rounded-md"
-                src={link.replace("watch", "embed").replace("?v=", "/")}
+                src={link.replace("watch?v=", "embed/")}
                 title="YouTube video player"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -51,9 +51,11 @@ const Card = ({ title, link, type }: CardProps) => {
             </div>
           )}
           {type === "twitter" && (
-            <blockquote className="twitter-tweet">
-              <a href={link.replace("x.com", "twitter.com")}></a>
-            </blockquote>
+            <div className="h-full flex items-center justify-center">
+              <blockquote className="twitter-tweet">
+                <a href={link.replace("x.com", "twitter.com")}></a>
+              </blockquote>
+            </div>
           )}
         </div>
       </div>

@@ -7,17 +7,14 @@ import bcrypt from "bcrypt";
 import { getTagsId, userMiddleware } from "./middleware";
 import crypto from "crypto";
 import dotenv from "dotenv";
+import cors from "cors";
 dotenv.config();
-
-
-console.log("DB_URL:", process.env.DB_URL); // Debugging
-console.log("JWT_SECRET:", process.env.JWT_SECRET); // Debugging
-console.log("SALT_ROUNDS:", process.env.SALT_ROUNDS); // Debugging
-
 const app = express();
+app.use(cors());
 app.use(express.json());
 
-const JWT_SECRET: string = "prathamxxc";
+const JWT_SECRET: string = process.env.JWT_SECRET as string;
+const SALT_ROUNDS: number = parseInt(process.env.SALT_ROUNDS as string);
 app.post("/api/v1/signup", async (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
@@ -26,7 +23,6 @@ app.post("/api/v1/signup", async (req, res) => {
     .string()
     .min(3, { message: "Username must be at least 3 characters long" })
     .max(30, { message: "Username must not exceed 30 characters" })
-    .regex(/^[a-zA-Z0-9]+$/, { message: "Username must be alphanumeric" })
     .nonempty({ message: "Username is required" });
 
   const passwordSchema = z
@@ -40,22 +36,27 @@ app.post("/api/v1/signup", async (req, res) => {
     const validatedUsername = usernameSchema.parse(username);
     const validatedPassword = passwordSchema.parse(password);
 
-    const saltRounds = 3;
-    const hashedPassword = await bcrypt.hash(validatedPassword, saltRounds);
+    const hashedPassword = await bcrypt.hash(validatedPassword,  SALT_ROUNDS );
 
     const userExist = await userModel.findOne({
       username: username,
     });
+    if (userExist) {
+      res.status(403).json({
+        message: "Username already exists",
+      });
+      return;
+    }
 
     const response = await userModel.create({
       username: validatedUsername,
       password: hashedPassword,
     });
-
-    res.status(201).json({
-      message: "User created successfully",
-
-    });
+    if (response) {
+      res.status(200).json({
+        message: "User created successfully",
+      });
+    }
   } catch (error) {
     if (error instanceof z.ZodError) {
       res.status(411).json({
@@ -142,7 +143,8 @@ app.get("/api/v1/content", userMiddleware, async (req, res) => {
   try {
     const response = await contentModel
       .find({ userId })
-      .populate("userId", "username");
+      .populate("userId", "username")
+      .populate("tags","title");
 
     if (response.length > 0) {
       res.status(200).json({ contents: response });
@@ -224,8 +226,12 @@ app.get("/api/v1/brain/:shareLink", async (req, res) => {
     const response = await linkModel
       .findOne({ hash });
     if(response){
-      const content = await contentModel.find({userId:response.userId})
-      .populate("userId", "username");
+      const content = await contentModel.find({ userId: response.userId })
+        .populate("userId", "username")
+        .populate({
+          path: "tags",
+          select: "title"
+        });
       res.status(200).json({
         data: content
     })  
@@ -249,7 +255,7 @@ app.get("/api/v1/brain/:shareLink", async (req, res) => {
 async function main() {
   try {
     await mongoose.connect(
-      "mongodb+srv://prathammx:password07@cluster0.tiys7.mongodb.net/second-brain",
+      process.env.DB_URL as string,
       {
         serverSelectionTimeoutMS: 50000,
       }

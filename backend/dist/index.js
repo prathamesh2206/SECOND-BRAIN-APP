@@ -21,13 +21,13 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const middleware_1 = require("./middleware");
 const crypto_1 = __importDefault(require("crypto"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const cors_1 = __importDefault(require("cors"));
 dotenv_1.default.config();
-console.log("DB_URL:", process.env.DB_URL); // Debugging
-console.log("JWT_SECRET:", process.env.JWT_SECRET); // Debugging
-console.log("SALT_ROUNDS:", process.env.SALT_ROUNDS); // Debugging
 const app = (0, express_1.default)();
+app.use((0, cors_1.default)());
 app.use(express_1.default.json());
-const JWT_SECRET = "prathamxxc";
+const JWT_SECRET = process.env.JWT_SECRET;
+const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS);
 app.post("/api/v1/signup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const username = req.body.username;
     const password = req.body.password;
@@ -35,7 +35,6 @@ app.post("/api/v1/signup", (req, res) => __awaiter(void 0, void 0, void 0, funct
         .string()
         .min(3, { message: "Username must be at least 3 characters long" })
         .max(30, { message: "Username must not exceed 30 characters" })
-        .regex(/^[a-zA-Z0-9]+$/, { message: "Username must be alphanumeric" })
         .nonempty({ message: "Username is required" });
     const passwordSchema = zod_1.z
         .string()
@@ -46,18 +45,25 @@ app.post("/api/v1/signup", (req, res) => __awaiter(void 0, void 0, void 0, funct
     try {
         const validatedUsername = usernameSchema.parse(username);
         const validatedPassword = passwordSchema.parse(password);
-        const saltRounds = 3;
-        const hashedPassword = yield bcrypt_1.default.hash(validatedPassword, saltRounds);
+        const hashedPassword = yield bcrypt_1.default.hash(validatedPassword, SALT_ROUNDS);
         const userExist = yield db_1.userModel.findOne({
             username: username,
         });
+        if (userExist) {
+            res.status(403).json({
+                message: "Username already exists",
+            });
+            return;
+        }
         const response = yield db_1.userModel.create({
             username: validatedUsername,
             password: hashedPassword,
         });
-        res.status(201).json({
-            message: "User created successfully",
-        });
+        if (response) {
+            res.status(200).json({
+                message: "User created successfully",
+            });
+        }
     }
     catch (error) {
         if (error instanceof zod_1.z.ZodError) {
@@ -135,7 +141,8 @@ app.get("/api/v1/content", middleware_1.userMiddleware, (req, res) => __awaiter(
     try {
         const response = yield db_1.contentModel
             .find({ userId })
-            .populate("userId", "username");
+            .populate("userId", "username")
+            .populate("tags", "title");
         if (response.length > 0) {
             res.status(200).json({ contents: response });
         }
@@ -216,7 +223,11 @@ app.get("/api/v1/brain/:shareLink", (req, res) => __awaiter(void 0, void 0, void
             .findOne({ hash });
         if (response) {
             const content = yield db_1.contentModel.find({ userId: response.userId })
-                .populate("userId", "username");
+                .populate("userId", "username")
+                .populate({
+                path: "tags",
+                select: "title"
+            });
             res.status(200).json({
                 data: content
             });
@@ -239,7 +250,7 @@ app.get("/api/v1/brain/:shareLink", (req, res) => __awaiter(void 0, void 0, void
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            yield mongoose_1.default.connect("mongodb+srv://prathammx:password07@cluster0.tiys7.mongodb.net/second-brain", {
+            yield mongoose_1.default.connect(process.env.DB_URL, {
                 serverSelectionTimeoutMS: 50000,
             });
         }
