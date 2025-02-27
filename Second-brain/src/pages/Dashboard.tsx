@@ -1,6 +1,6 @@
 import { useState } from "react"
 import Button from "../components/Button"
-import Card from "../components/Card"
+import Card  from "../components/Card"
 import CreateContentModal from "../components/CreateContentModal"
 import PlusIcon from "../icons/PlusIcon"
 import ShareIcon from "../icons/ShareIcon"
@@ -31,8 +31,8 @@ function Dashboard() {
         {/* Content Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 auto-rows-min">
           {/* map the data */}
-          <Card title="First Tweet" link="https://x.com/abhwshek/status/1891038378063442246" type="twitter"/>
-          <Card title="First Video" link="https://www.youtube.com/watch?v=hYip_Vuv8J0" type="youtube"/>
+          <Card title="First Tweet" link="https://x.com/abhwshek/status/1891038378063442246" type="twitter" tags={["tag1", "tag2", "tag3"]}/>
+          <Card title="First Video" link="https://www.youtube.com/watch?v=hYip_Vuv8J0" type="youtube" tags={["tag1", "tag2", "tag3"]} />
         </div>
       </div>
     </div>

@@ -10,14 +10,20 @@ interface ModalProps {
 }
 
 const CreateContentModal = ({ open, onClose, onSubmit }: ModalProps) => {
-  const [formData, setFormData] = useState({ title: "", link: "" });
-  const [errors, setErrors] = useState({ title: "", link: "" });
+  enum ContentType {
+    Youtube=" Youtube",
+    Twitter ="Twitter"
+  }
+  const [formData, setFormData] = useState({ title: "", link: "",tags :"" });
+  const [errors, setErrors] = useState({ title: "", link: "",tags:"" });
+  const [type,setType]=useState(ContentType.Youtube);
 
   const handleSubmit = () => {
     // Basic validation
     const newErrors = {
       title: !formData.title ? "Title is required" : "",
       link: !formData.link ? "Link is required" : "",
+      tags: !formData.tags ? "Tags is required" : "",
     };
     setErrors(newErrors);
 
@@ -25,7 +31,9 @@ const CreateContentModal = ({ open, onClose, onSubmit }: ModalProps) => {
       onSubmit?.(formData);
       onClose();
     }
+          
   };
+  
 
   if (!open) return null;
 
@@ -41,6 +49,7 @@ const CreateContentModal = ({ open, onClose, onSubmit }: ModalProps) => {
             <CrossIcon />
           </button>
         </div>
+        
 
         <div className="space-y-4">
           <Input
@@ -59,7 +68,34 @@ const CreateContentModal = ({ open, onClose, onSubmit }: ModalProps) => {
             error={errors.link}
             onChange={(e) =>
               setFormData((prev) => ({ ...prev, link: e.target.value }))
+            } 
+                   
+          />
+
+
+          <Input
+            label="Tags"
+            placeholder="eg:passion,joy,sexy"
+            value={formData.tags}
+            error={errors.tags}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, tags: e.target.value }))
             }
+          />
+        </div>
+
+        <div className="flex gap-4 mb-6 mt-4">
+          <Button 
+            text="Youtube" 
+            variant={type === ContentType.Youtube ? "primary" : "secondary"}
+            onClick={() =>{setType(ContentType.Youtube)} }
+            widthFull={true}
+          />
+          <Button 
+            text="Twitter" 
+            variant={type === ContentType.Twitter ? "primary" : "secondary"}
+            onClick={() => {setType(ContentType.Twitter)}}
+            widthFull={true}
           />
         </div>
 
