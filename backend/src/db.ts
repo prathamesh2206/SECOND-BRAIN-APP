@@ -11,7 +11,7 @@ const tagSchema = new mongoose.Schema({
 });
 const tagModel = mongoose.model("Tags", tagSchema);
 
-const contentTypes = ['image', 'video', 'article', 'audio']; 
+const contentTypes = ["Youtube", "Twitter"]; 
 const contentSchema = new mongoose.Schema({
     link: { type: String, required: true },
     type: { type: String, enum: contentTypes, required: true },

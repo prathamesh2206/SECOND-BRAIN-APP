@@ -1,17 +1,20 @@
-interface tags{
-    tags : string[]
+interface TagsProps {
+  tags: { 
+    _id?: string; 
+    title: string; 
+  }[];
 }
 
-const Tags = ( {tags}:tags) => {
+const Tags = ({ tags }: TagsProps) => {
   return (
     <div>
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-2">
         {tags.map((tag, index) => (
           <span 
-            key={index}
+            key={tag._id || index}
             className="px-3 py-1 text-sm rounded-full bg-indigo-100 text-indigo-700 font-medium"
           >
-            #{tag.trim()}
+            #{tag.title.trim()}
           </span>
         ))}
       </div>
@@ -19,4 +22,4 @@ const Tags = ( {tags}:tags) => {
   )
 }
 
-export default Tags
+export default Tags;

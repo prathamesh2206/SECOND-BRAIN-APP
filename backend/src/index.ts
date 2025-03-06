@@ -161,27 +161,33 @@ app.get("/api/v1/content", userMiddleware, async (req, res) => {
   }
 });
 
-app.delete("/api/v1/content", userMiddleware, async (req, res) => {
-  const contentId = req.body.contentId;
-  const userId = req.body.userId;
+app.delete("/api/v1/content/:contentId", userMiddleware, async (req, res) => {
+  const contentId = req.params.contentId;
+  const userId = req.userId; // Assuming userMiddleware adds userId to req
+  
   try {
     const response = await contentModel.deleteOne({
       _id: contentId,
       userId: userId,
     });
-    if (response) {
-      res.status(200).json({
-        message: "content deleted sucessfully",
+    
+    if (response.deletedCount > 0) {
+       res.status(200).json({
+        message: "Content deleted successfully",
+      });
+    } else {
+       res.status(404).json({
+        message: "Content not found or you don't have permission to delete it",
       });
     }
   } catch (err) {
-    res.status(500).json({
-      msg: "internal server error",
-      error: err,
+    console.error("Error deleting content:", err);
+     res.status(500).json({
+      message: "Internal server error",
+      error: (err as Error).message,
     });
   }
 });
-
 app.post("/api/v1/brain/share", userMiddleware, async (req, res) => {
   const { share} = req.body;
   const userId = req.userId;
@@ -191,6 +197,15 @@ app.post("/api/v1/brain/share", userMiddleware, async (req, res) => {
       if(!userId) {
         res.status(400).json({
           msg: "User id is required",
+        });
+        return;
+      }
+      const linkExist = await linkModel.findOne({
+        userId:userId
+      });
+      if(linkExist){
+        res.status(200).json({
+          link: linkExist.hash,
         });
         return;
       }

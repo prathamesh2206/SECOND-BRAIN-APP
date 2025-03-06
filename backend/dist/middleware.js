@@ -18,10 +18,9 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const db_1 = require("./db");
 dotenv_1.default.config();
 const userMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
     try {
         const SECRET = process.env.JWT_SECRET || "your_secret_key";
-        const token = (_a = req.header("Authorization")) === null || _a === void 0 ? void 0 : _a.replace("Bearer ", "");
+        const token = req.header("Authorization");
         if (!token) {
             res.status(401).json({ message: "Unauthorized" });
             return;
@@ -37,6 +36,10 @@ const userMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
 exports.userMiddleware = userMiddleware;
 const getTagsId = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        console.log("Received request body:", req.body);
+        console.log("Received tags:", req.body.tags);
+        console.log("Tags type:", typeof req.body.tags);
+        console.log("Is array:", Array.isArray(req.body.tags));
         const tags = req.body.tags;
         const existingTags = yield db_1.tagModel.find({
             title: { $in: tags },

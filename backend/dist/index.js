@@ -159,24 +159,30 @@ app.get("/api/v1/content", middleware_1.userMiddleware, (req, res) => __awaiter(
         });
     }
 }));
-app.delete("/api/v1/content", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const contentId = req.body.contentId;
-    const userId = req.body.userId;
+app.delete("/api/v1/content/:contentId", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const contentId = req.params.contentId;
+    const userId = req.userId; // Assuming userMiddleware adds userId to req
     try {
         const response = yield db_1.contentModel.deleteOne({
             _id: contentId,
             userId: userId,
         });
-        if (response) {
+        if (response.deletedCount > 0) {
             res.status(200).json({
-                message: "content deleted sucessfully",
+                message: "Content deleted successfully",
+            });
+        }
+        else {
+            res.status(404).json({
+                message: "Content not found or you don't have permission to delete it",
             });
         }
     }
     catch (err) {
+        console.error("Error deleting content:", err);
         res.status(500).json({
-            msg: "internal server error",
-            error: err,
+            message: "Internal server error",
+            error: err.message,
         });
     }
 }));
@@ -188,6 +194,15 @@ app.post("/api/v1/brain/share", middleware_1.userMiddleware, (req, res) => __awa
             if (!userId) {
                 res.status(400).json({
                     msg: "User id is required",
+                });
+                return;
+            }
+            const linkExist = yield db_1.linkModel.findOne({
+                userId: userId
+            });
+            if (linkExist) {
+                res.status(200).json({
+                    link: linkExist.hash,
                 });
                 return;
             }

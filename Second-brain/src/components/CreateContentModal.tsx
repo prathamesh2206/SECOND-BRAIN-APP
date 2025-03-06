@@ -2,6 +2,8 @@ import { useState } from "react";
 import CrossIcon from "../icons/CrossIcon"
 import Button from "./Button"
 import Input from "./Input"
+import { BACKEND_URL } from "../config";
+import axios from "axios";
 
 interface ModalProps {
   open: boolean;
@@ -11,14 +13,14 @@ interface ModalProps {
 
 const CreateContentModal = ({ open, onClose, onSubmit }: ModalProps) => {
   enum ContentType {
-    Youtube=" Youtube",
+    Youtube="Youtube",
     Twitter ="Twitter"
   }
   const [formData, setFormData] = useState({ title: "", link: "",tags :"" });
   const [errors, setErrors] = useState({ title: "", link: "",tags:"" });
   const [type,setType]=useState(ContentType.Youtube);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Basic validation
     const newErrors = {
       title: !formData.title ? "Title is required" : "",
@@ -31,6 +33,24 @@ const CreateContentModal = ({ open, onClose, onSubmit }: ModalProps) => {
       onSubmit?.(formData);
       onClose();
     }
+    const response = await axios.post(`${BACKEND_URL}/content`, {
+      title: formData.title,
+      link: formData.link,
+      tags: formData.tags.split(","),
+      type:type,
+    },
+  {headers:{
+    Authorization: localStorage.getItem("Authorization")
+  }});
+    if (response.status === 200) {
+      setFormData({ title: "", link: "",tags:"" });
+      onClose();
+    }
+    else{
+      alert(response.data.message);
+    }
+
+
           
   };
   

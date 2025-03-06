@@ -23,7 +23,7 @@ export const userMiddleware = async (
 ): Promise<void> => {
   try {
     const SECRET = process.env.JWT_SECRET || "your_secret_key";
-      const token = req.header("Authorization")?.replace("Bearer ", "");
+      const token = req.header("Authorization");
       if (!token) {
           res.status(401).json({ message: "Unauthorized" });
           return;
@@ -43,6 +43,11 @@ export const userMiddleware = async (
 
 export const getTagsId = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    console.log("Received request body:", req.body);
+     console.log("Received tags:", req.body.tags);
+     console.log("Tags type:", typeof req.body.tags);
+     console.log("Is array:", Array.isArray(req.body.tags));
+
     const tags = req.body.tags;
 
     const existingTags = await tagModel.find({

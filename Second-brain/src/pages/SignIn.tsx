@@ -21,7 +21,7 @@ const SignIn = () => {
     if (response.status == 200) {
       console.log(response.data);
       const jwt = response.data.token;
-      localStorage.setItem("token", jwt);
+      localStorage.setItem("Authorization", jwt);
       navigate("/dashboard");
     }
   }
