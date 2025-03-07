@@ -9,7 +9,7 @@ interface CardProps {
   link: string;
   type: "Youtube" | "Twitter";
   tags: { _id?: string; title: string }[];
-  onDelete: () => Promise<void>;
+  onDelete?: () => Promise<void>;
 }
 
 const Card = ({onDelete, title, link, type, tags }: CardProps) => {
